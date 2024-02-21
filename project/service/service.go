@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	stdHTTP "net/http"
-	"tickets/entities"
 	ticketsHttp "tickets/http"
 	"tickets/message"
 	"tickets/message/event"
@@ -36,15 +35,23 @@ func New(
 	redisPublisher = message.NewRedisPublisher(redisClient, watermillLogger)
 	redisPublisher = log.CorrelationPublisherDecorator{Publisher: redisPublisher}
 
-	watermillRouter := message.NewWatermillRouter(
-		receiptsService,
+	eventBus := event.NewBus(redisPublisher)
+
+	eventsHandler := event.NewHandler(
 		spreadsheetsService,
-		redisClient,
+		receiptsService,
+	)
+
+	eventProcessorConfig := event.NewProcessorConfig(redisClient, watermillLogger)
+
+	watermillRouter := message.NewWatermillRouter(
+		eventProcessorConfig,
+		eventsHandler,
 		watermillLogger,
 	)
 
 	echoRouter := ticketsHttp.NewHttpRouter(
-		redisPublisher,
+		eventBus,
 		spreadsheetsService,
 	)
 
@@ -82,8 +89,4 @@ func (s Service) Run(
 	})
 
 	return errgrp.Wait()
-}
-
-type ReceiptsService interface {
-	IssueReceipt(ctx context.Context, request entities.IssueReceiptRequest) (entities.IssueReceiptResponse, error)
 }

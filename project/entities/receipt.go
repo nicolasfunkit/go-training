@@ -1,8 +1,6 @@
 package entities
 
-import (
-	"time"
-)
+import "time"
 
 type VoidReceipt struct {
 	TicketID       string

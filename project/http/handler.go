@@ -1,16 +1,36 @@
-package http
+package event
 
 import (
 	"context"
-
-	"github.com/ThreeDotsLabs/watermill/message"
+	"tickets/entities"
 )
 
 type Handler struct {
-	publisher             message.Publisher
-	spreadsheetsAPIClient SpreadsheetsAPI
+	spreadsheetsService SpreadsheetsAPI
+	receiptsService     ReceiptsService
+}
+
+func NewHandler(
+	spreadsheetsService SpreadsheetsAPI,
+	receiptsService ReceiptsService,
+) Handler {
+	if spreadsheetsService == nil {
+		panic("missing spreadsheetsService")
+	}
+	if receiptsService == nil {
+		panic("missing receiptsService")
+	}
+
+	return Handler{
+		spreadsheetsService: spreadsheetsService,
+		receiptsService:     receiptsService,
+	}
 }
 
 type SpreadsheetsAPI interface {
-	AppendRow(ctx context.Context, spreadsheetName string, row []string) error
+	AppendRow(ctx context.Context, sheetName string, row []string) error
+}
+
+type ReceiptsService interface {
+	IssueReceipt(ctx context.Context, request entities.IssueReceiptRequest) (entities.IssueReceiptResponse, error)
 }
