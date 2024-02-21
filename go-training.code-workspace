@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "project"
+		},
+		{
+			"path": "06-middlewares/01-add-middleware"
+		}
+	],
+	"settings": {}
+}

@@ -1,0 +1,39 @@
+# https://taskfile.dev
+# Run in devcontainer
+version: "3"
+
+silent: true
+
+env:
+  DCRUN: docker compose run --rm
+
+tasks:
+  default:
+    cmds:
+      - task --list
+
+  app:up:
+    desc: Launch mandatory commands for the app to be up&ready
+    dotenv: ['.env', '{{.ENV}}/.env.', '{{.HOME}}/.env']
+    status:
+      - /bin/bash -c "[[ -z \"${CI}\" ]] && exit 1 || exit 0"
+    cmds:
+      - tdl training configure $TOKEN
+
+
+  app:run:
+    desc: Run
+    status:
+      - /bin/bash -c "[[ -z \"${CI}\" ]] && exit 1 || exit 0"
+    cmds:
+      - tdl training run
+
+  app:test:
+    desc: Test
+    
+    dir: './project/'
+    status:
+      - /bin/bash -c "[[ -z \"${CI}\" ]] && exit 1 || exit 0"
+    cmds: 
+      - docker compose up -d
+      - REDIS_ADDR=localhost:6379 go test ./tests/ -v
