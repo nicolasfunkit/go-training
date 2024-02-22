@@ -37,3 +37,4 @@ tasks:
     cmds: 
       - docker compose up -d
       - REDIS_ADDR=localhost:6379 go test ./tests/ -v
+      - POSTGRES_URL=postgres://user:password@localhost:5432/db?sslmode=disable go test ./db/ -v

@@ -20,7 +20,8 @@ func (p *PaymentsHandler) HandlePaymentTaken(ctx context.Context, event *Payment
 }
 
 type PaymentsRepository struct {
-	payments []PaymentTaken
+	payments    []PaymentTaken
+	paymentsIDs map[string]struct{}
 }
 
 func (p *PaymentsRepository) Payments() []PaymentTaken {
@@ -28,10 +29,29 @@ func (p *PaymentsRepository) Payments() []PaymentTaken {
 }
 
 func NewPaymentsRepository() *PaymentsRepository {
-	return &PaymentsRepository{}
+	return &PaymentsRepository{
+		paymentsIDs: make(map[string]struct{}),
+	}
+}
+
+func hasStruct(structs []PaymentTaken, id string) bool {
+	for _, s := range structs {
+		if s.PaymentID == id {
+			return true
+		}
+	}
+	return false
 }
 
 func (p *PaymentsRepository) SavePaymentTaken(ctx context.Context, event *PaymentTaken) error {
+	if hasStruct(p.payments, event.PaymentID) {
+		return nil
+	}
+	if _, ok := p.paymentsIDs[event.PaymentID]; ok {
+		return nil
+	}
+
+	p.paymentsIDs[event.PaymentID] = struct{}{}
 	p.payments = append(p.payments, *event)
 	return nil
 }

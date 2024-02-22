@@ -3,33 +3,50 @@ package event
 import (
 	"context"
 	"tickets/entities"
+
+	"github.com/ThreeDotsLabs/watermill/components/cqrs"
 )
 
 type Handler struct {
 	spreadsheetsService SpreadsheetsAPI
 	receiptsService     ReceiptsService
+	filesAPI            FilesAPI
 	ticketsRepository   TicketsRepository
+	eventBus            *cqrs.EventBus
 }
 
 func NewHandler(
 	spreadsheetsService SpreadsheetsAPI,
 	receiptsService ReceiptsService,
+	filesAPI FilesAPI,
 	ticketsRepository TicketsRepository,
+	eventBus *cqrs.EventBus,
 ) Handler {
+	if eventBus == nil {
+		panic("missing eventBus")
+	}
 	if spreadsheetsService == nil {
 		panic("missing spreadsheetsService")
 	}
 	if receiptsService == nil {
 		panic("missing receiptsService")
 	}
+	if filesAPI == nil {
+		panic("missing filesAPI")
+	}
 	if ticketsRepository == nil {
 		panic("missing ticketsRepository")
+	}
+	if eventBus == nil {
+		panic("missing eventBus")
 	}
 
 	return Handler{
 		spreadsheetsService: spreadsheetsService,
 		receiptsService:     receiptsService,
+		filesAPI:            filesAPI,
 		ticketsRepository:   ticketsRepository,
+		eventBus:            eventBus,
 	}
 }
 
@@ -39,6 +56,10 @@ type SpreadsheetsAPI interface {
 
 type ReceiptsService interface {
 	IssueReceipt(ctx context.Context, request entities.IssueReceiptRequest) (entities.IssueReceiptResponse, error)
+}
+
+type FilesAPI interface {
+	UploadFile(ctx context.Context, fileID string, fileContent string) error
 }
 
 type TicketsRepository interface {
