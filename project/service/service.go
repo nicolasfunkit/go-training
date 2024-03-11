@@ -37,6 +37,8 @@ func New(
 	filesAPI event.FilesAPI,
 ) Service {
 	ticketsRepo := db.NewTicketsRepository(dbConn)
+	showsRepo := db.NewShowsRepository(dbConn)
+	bookingsRepository := db.NewBookingsRepository(dbConn)
 
 	watermillLogger := log.NewWatermill(log.FromContext(context.Background()))
 
@@ -65,6 +67,8 @@ func New(
 		eventBus,
 		spreadsheetsService,
 		ticketsRepo,
+		showsRepo,
+		bookingsRepository,
 	)
 
 	return Service{
