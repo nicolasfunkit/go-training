@@ -8,6 +8,7 @@ import (
 	ticketsHttp "tickets/http"
 	"tickets/message"
 	"tickets/message/event"
+	"tickets/message/outbox"
 
 	"github.com/ThreeDotsLabs/go-event-driven/common/log"
 	watermillMessage "github.com/ThreeDotsLabs/watermill/message"
@@ -32,6 +33,7 @@ type Service struct {
 func New(
 	dbConn *sqlx.DB,
 	redisClient *redis.Client,
+	deadNationAPI event.DeadNationAPI,
 	spreadsheetsService event.SpreadsheetsAPI,
 	receiptsService event.ReceiptsService,
 	filesAPI event.FilesAPI,
@@ -49,15 +51,21 @@ func New(
 	eventBus := event.NewBus(redisPublisher)
 
 	eventsHandler := event.NewHandler(
+		deadNationAPI,
 		spreadsheetsService,
 		receiptsService,
 		filesAPI,
 		ticketsRepo,
+		showsRepo,
 		eventBus,
 	)
+
+	postgresSubscriber := outbox.NewPostgresSubscriber(dbConn.DB, watermillLogger)
 	eventProcessorConfig := event.NewProcessorConfig(redisClient, watermillLogger)
 
 	watermillRouter := message.NewWatermillRouter(
+		postgresSubscriber,
+		redisPublisher,
 		eventProcessorConfig,
 		eventsHandler,
 		watermillLogger,
