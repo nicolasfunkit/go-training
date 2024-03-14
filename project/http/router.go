@@ -10,6 +10,7 @@ import (
 
 func NewHttpRouter(
 	eventBus *cqrs.EventBus,
+	commandBus *cqrs.CommandBus,
 	spreadsheetsAPIClient SpreadsheetsAPI,
 	ticketsRepository TicketsRepository,
 	showsRepository ShowsRepository,
@@ -23,6 +24,7 @@ func NewHttpRouter(
 
 	handler := Handler{
 		eventBus:              eventBus,
+		commandBus:            commandBus,
 		spreadsheetsAPIClient: spreadsheetsAPIClient,
 		ticketsRepo:           ticketsRepository,
 		showsRepository:       showsRepository,
@@ -35,6 +37,8 @@ func NewHttpRouter(
 	e.POST("/book-tickets", handler.PostBookTickets)
 
 	e.POST("/shows", handler.PostShows)
+
+	e.PUT("/ticket-refund/:ticket_id", handler.PutTicketRefund)
 
 	return e
 }
