@@ -9,8 +9,8 @@ import (
 )
 
 type Handler struct {
-	commandBus            *cqrs.CommandBus
 	eventBus              *cqrs.EventBus
+	commandBus            *cqrs.CommandBus
 	spreadsheetsAPIClient SpreadsheetsAPI
 	ticketsRepo           TicketsRepository
 

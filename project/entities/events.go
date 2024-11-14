@@ -52,17 +52,6 @@ type TicketRefunded struct {
 	TicketID string `json:"ticket_id"`
 }
 
-type BookingMade struct {
-	Header EventHeader `json:"header"`
-
-	NumberOfTickets int `json:"number_of_tickets"`
-
-	BookingID uuid.UUID `json:"booking_id"`
-
-	CustomerEmail string    `json:"customer_email"`
-	ShowId        uuid.UUID `json:"show_id"`
-}
-
 type TicketPrinted struct {
 	Header EventHeader `json:"header"`
 
@@ -77,4 +66,15 @@ type TicketReceiptIssued struct {
 	ReceiptNumber string `json:"receipt_number"`
 
 	IssuedAt time.Time `json:"issued_at"`
+}
+
+type BookingMade struct {
+	Header EventHeader `json:"header"`
+
+	NumberOfTickets int `json:"number_of_tickets"`
+
+	BookingID uuid.UUID `json:"booking_id"`
+
+	CustomerEmail string    `json:"customer_email"`
+	ShowId        uuid.UUID `json:"show_id"`
 }

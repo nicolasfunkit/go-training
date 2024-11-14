@@ -46,6 +46,7 @@ func New(
 	paymentsService command.PaymentsService,
 ) Service {
 	ticketsRepo := db.NewTicketsRepository(dbConn)
+	OpsBookingReadModel := db.NewOpsBookingReadModel(dbConn)
 	showsRepo := db.NewShowsRepository(dbConn)
 	bookingsRepository := db.NewBookingsRepository(dbConn)
 
@@ -72,6 +73,7 @@ func New(
 		receiptsService,
 		paymentsService,
 	)
+
 	commandBus := command.NewBus(redisPublisher, command.NewBusConfig(watermillLogger))
 
 	postgresSubscriber := outbox.NewPostgresSubscriber(dbConn.DB, watermillLogger)
@@ -85,6 +87,7 @@ func New(
 		eventsHandler,
 		commandProcessorConfig,
 		commandsHandler,
+		OpsBookingReadModel,
 		watermillLogger,
 	)
 
